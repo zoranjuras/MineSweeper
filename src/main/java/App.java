@@ -1,5 +1,9 @@
+import javax.swing.*;
+
 public class App {
+
     public static void main(String[] args) {
-        Minesweeper minesweeper = new Minesweeper();
+        SwingUtilities.invokeLater(Minesweeper::new);
     }
+
 }
