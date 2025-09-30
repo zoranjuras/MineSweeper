@@ -77,6 +77,13 @@ public class Minesweeper {
                                     checkMine(tile.row, tile.col);
                                 }
                             }
+                        // right click
+                        } else if (e.getButton() == MouseEvent.BUTTON3) {
+                            if (tile.getText().isEmpty() && tile.isEnabled()) {
+                                tile.setText("\uD83D\uDEA9"); // 🚩
+                            } else if (Objects.equals(tile.getText(), "\uD83D\uDEA9")) {
+                                tile.setText("");
+                            }
                         }
                     }
                 });
@@ -92,8 +99,7 @@ public class Minesweeper {
     private void revealMines() {
         for (int i = 0; i < mineList.size(); i++) {
             MineTile tile = mineList.get(i);
-            tile.setText("\uD83D\uDCA3");
-            
+            tile.setText("\uD83D\uDCA3"); // 💣
         }
     }
 
