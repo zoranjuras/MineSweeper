@@ -109,7 +109,15 @@ public class Minesweeper {
     }
 
     void checkMine(int r, int c) {
+
+        if (r < 0 || r >= numRows || c < 0 || c >= numCols) {
+            return;
+        }
+
         MineTile tile = board[r][c];
+        if (!tile.isEnabled()) {
+            return;
+        }
         tile.setEnabled(false);
 
         int minesFound = 0;
@@ -133,6 +141,20 @@ public class Minesweeper {
         }
         else {
             tile.setText("");
+
+            // top 3 neighbour tiles
+            checkMine(r - 1, c - 1); // top left
+            checkMine(r - 1, c); // top
+            checkMine(r - 1, c + 1); // top right
+
+            // left and right
+            checkMine(r, c - 1); // left
+            checkMine(r, c + 1); // right
+
+            // bottom 3
+            checkMine(r + 1, c - 1); // bottom left
+            checkMine(r + 1, c); // bottom
+            checkMine(r + 1, c + 1); // bottom right
         }
     }
 
