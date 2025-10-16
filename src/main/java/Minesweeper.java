@@ -31,6 +31,9 @@ public class Minesweeper {
     MineTile[][] board = new MineTile[numRows][numCols];
     ArrayList<MineTile> mineList;
 
+    int tilesClicked = 0; // goal is to click all the tiles except mines
+    boolean gameOver= false;
+
     public Minesweeper() {
         frame.setSize(boardWidth, boardHeight);
         frame.setLocationRelativeTo(null);
@@ -65,13 +68,16 @@ public class Minesweeper {
                 tile.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mousePressed(MouseEvent e) {
+                        if (gameOver) {
+                            return;
+                        }
                         MineTile tile = (MineTile) e.getSource();
 
                         // left click
                         if (e.getButton() == MouseEvent.BUTTON1) {
                             if (Objects.equals(tile.getText(), "")) {
                                 if (mineList.contains(tile)) {
-                                    revealMines();
+                                    gameLost();
                                 }
                                 else {
                                     checkMine(tile.row, tile.col);
@@ -103,6 +109,12 @@ public class Minesweeper {
         }
     }
 
+    private void gameLost() {
+        revealMines();
+        gameOver = true;
+        textLabel.setText("GAME OVER!");
+    }
+
     private void setMines() {
 
         mineList = new ArrayList<>();
@@ -125,6 +137,7 @@ public class Minesweeper {
             return;
         }
         tile.setEnabled(false);
+        tilesClicked += 1;
 
         int minesFound = 0;
 
@@ -161,6 +174,12 @@ public class Minesweeper {
             checkMine(r + 1, c - 1); // bottom left
             checkMine(r + 1, c); // bottom
             checkMine(r + 1, c + 1); // bottom right
+        }
+
+        if (tilesClicked == numRows * numCols - mineList.size()) {
+            gameOver = true;
+            revealMines();
+            textLabel.setText("Bravo! Minefield cleared!");
         }
     }
 
