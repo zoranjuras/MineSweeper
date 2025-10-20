@@ -59,7 +59,7 @@ public class Minesweeper {
 
         textLabel.setFont(new Font("Arial", Font.BOLD, 25));
         textLabel.setHorizontalAlignment(JLabel.CENTER);
-        textLabel.setText("Minesweeper");
+        textLabel.setText("Minesweeper: "+ Integer.toString(mineCount) + " mines to find");
         textLabel.setOpaque(true);
 
         textPanel.setLayout(new BorderLayout());
