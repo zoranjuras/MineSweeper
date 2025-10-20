@@ -15,6 +15,19 @@ public class Minesweeper {
             this.row = row;
             this.col = col;
         }
+
+        public ArrayList<MineTile> getNeighbourTiles() {
+            ArrayList<MineTile> neighbours = new ArrayList<>();
+            for (int i = row - 1; i <= row + 1; i++) {
+                for (int j = col - 1; j <= col + 1; j++) {
+                    if (i == row && j == col) continue;
+                    if (i < 0 || i >= numRows || j < 0 || j >= numCols) continue;
+                    neighbours.add(board[i][j]);
+                }
+            }
+            return neighbours;
+        }
+
     }
 
     int tileSize = 70;
@@ -51,7 +64,6 @@ public class Minesweeper {
         frame.add(textPanel, BorderLayout.NORTH);
 
         boardPanel.setLayout(new GridLayout(numRows, numCols));
-//        boardPanel.setBackground(Color.GREEN);
         frame.add(boardPanel);
 
         for (int r = 0; r < numRows; r++) {
