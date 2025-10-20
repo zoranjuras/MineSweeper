@@ -4,6 +4,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Random;
 
 public class Minesweeper {
 
@@ -44,8 +45,10 @@ public class Minesweeper {
     MineTile[][] board = new MineTile[numRows][numCols];
     ArrayList<MineTile> mineList;
 
+    int mineCount = 5;
     int tilesClicked = 0; // goal is to click all the tiles except mines
     boolean gameOver= false;
+    Random random = new Random();
 
     public Minesweeper() {
         frame.setSize(boardWidth, boardHeight);
@@ -131,11 +134,16 @@ public class Minesweeper {
 
         mineList = new ArrayList<>();
 
-        mineList.add(board[2][2]);
-        mineList.add(board[2][3]);
-        mineList.add(board[5][6]);
-        mineList.add(board[3][4]);
-        mineList.add(board[1][1]);
+        int minesLeft = mineCount;
+        while (minesLeft > 0) {
+            int r = random.nextInt(numRows); // 0 to numRows - 1
+            int c = random.nextInt(numCols);
+            MineTile tile = board[r][c];
+            if (!mineList.contains(tile)) {
+                mineList.add(tile);
+                minesLeft -= 1;
+            }
+        }
     }
 
     void checkMine(int r, int c) {
