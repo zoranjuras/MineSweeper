@@ -1,3 +1,10 @@
+/**
+ * Minesweeper
+ * Version: 1.0.0
+ * Author: Zoran Juras
+ * Description: First functional version of the game Minesweeper in Java Swing.
+ */
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -28,7 +35,6 @@ public class Minesweeper {
             }
             return neighbours;
         }
-
     }
 
     int tileSize = 70;
@@ -46,7 +52,7 @@ public class Minesweeper {
     ArrayList<MineTile> mineList;
 
     int mineCount = 5;
-    int tilesClicked = 0; // goal is to click all the tiles except mines
+    int tilesRevealed = 0; // goal is to click all the tiles except mines
     boolean gameOver= false;
     Random random = new Random();
 
@@ -76,9 +82,7 @@ public class Minesweeper {
 
                 tile.setFocusable(false);
                 tile.setMargin(new Insets(0, 0, 0, 0));
-//                tile.setFont(new Font("Arial Unicode MS", Font.PLAIN, 45));
                 tile.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 45));
-//                tile.setText("\uD83D\uDCA3");
 
                 tile.addMouseListener(new MouseAdapter() {
                     @Override
@@ -118,8 +122,7 @@ public class Minesweeper {
     }
 
     private void revealMines() {
-        for (int i = 0; i < mineList.size(); i++) {
-            MineTile tile = mineList.get(i);
+        for (MineTile tile : mineList) {
             tile.setText("\uD83D\uDCA3"); // 💣
         }
     }
@@ -157,7 +160,7 @@ public class Minesweeper {
             return;
         }
         tile.setEnabled(false);
-        tilesClicked += 1;
+        tilesRevealed += 1;
 
         int minesFound = 0;
 
@@ -196,7 +199,7 @@ public class Minesweeper {
             checkMine(r + 1, c + 1); // bottom right
         }
 
-        if (tilesClicked == numRows * numCols - mineList.size()) {
+        if (tilesRevealed == numRows * numCols - mineList.size()) {
             gameOver = true;
             revealMines();
             textLabel.setText("Bravo! Minefield cleared!");
