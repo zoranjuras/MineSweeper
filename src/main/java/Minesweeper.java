@@ -1,8 +1,10 @@
 /**
  * Minesweeper
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Zoran Juras
- * Description: First functional version of the game Minesweeper in Java Swing.
+ * Description: Refactored version of Minesweeper in Java Swing.
+ *              checkMine and countMine now use MineTile objects for cleaner code.
+ * Date: 2025-10-22
  */
 
 import javax.swing.*;
@@ -52,7 +54,7 @@ public class Minesweeper {
     ArrayList<MineTile> mineList;
 
     int mineCount = 5;
-    int tilesRevealed = 0; // goal is to click all the tiles except mines
+    int tilesRevealed = 0; // goal is to reveal all the tiles except mines
     boolean gameOver= false;
     Random random = new Random();
 
@@ -65,7 +67,7 @@ public class Minesweeper {
 
         textLabel.setFont(new Font("Arial", Font.BOLD, 25));
         textLabel.setHorizontalAlignment(JLabel.CENTER);
-        textLabel.setText("Minesweeper: "+ Integer.toString(mineCount) + " mines to find");
+        textLabel.setText("Minesweeper: "+ mineCount + " mines to find");
         textLabel.setOpaque(true);
 
         textPanel.setLayout(new BorderLayout());
@@ -99,7 +101,7 @@ public class Minesweeper {
                                     gameLost();
                                 }
                                 else {
-                                    checkMine(tile.row, tile.col);
+                                    checkMine(tile);
                                 }
                             }
                         // right click
@@ -122,8 +124,8 @@ public class Minesweeper {
     }
 
     private void revealMines() {
-        for (MineTile tile : mineList) {
-            tile.setText("\uD83D\uDCA3"); // 💣
+        for (MineTile mt : mineList) {
+            mt.setText("\uD83D\uDCA3"); // 💣
         }
     }
 
@@ -136,8 +138,8 @@ public class Minesweeper {
     private void setMines() {
 
         mineList = new ArrayList<>();
-
         int minesLeft = mineCount;
+
         while (minesLeft > 0) {
             int r = random.nextInt(numRows); // 0 to numRows - 1
             int c = random.nextInt(numCols);
@@ -149,13 +151,9 @@ public class Minesweeper {
         }
     }
 
-    void checkMine(int r, int c) {
+    void checkMine(MineTile mt) {
 
-        if (r < 0 || r >= numRows || c < 0 || c >= numCols) {
-            return;
-        }
-
-        MineTile tile = board[r][c];
+        MineTile tile = board[mt.row][mt.col];
         if (!tile.isEnabled()) {
             return;
         }
@@ -164,19 +162,9 @@ public class Minesweeper {
 
         int minesFound = 0;
 
-        // top 3 neighbour tiles
-        minesFound += countMine(r - 1, c - 1); // top left
-        minesFound += countMine(r - 1, c); // top
-        minesFound += countMine(r - 1, c + 1); // top right
-
-        // left and right
-        minesFound += countMine(r, c - 1); // left
-        minesFound += countMine(r, c + 1); // right
-
-        // bottom 3
-        minesFound += countMine(r + 1, c - 1); // bottom left
-        minesFound += countMine(r + 1, c); // bottom
-        minesFound += countMine(r + 1, c + 1); // bottom right
+        for (MineTile t : mt.getNeighbourTiles()) {
+            minesFound += countMine(t);
+        }
 
         if (minesFound > 0) {
             tile.setText(Integer.toString(minesFound));
@@ -184,19 +172,9 @@ public class Minesweeper {
         else {
             tile.setText("");
 
-            // top 3 neighbour tiles
-            checkMine(r - 1, c - 1); // top left
-            checkMine(r - 1, c); // top
-            checkMine(r - 1, c + 1); // top right
-
-            // left and right
-            checkMine(r, c - 1); // left
-            checkMine(r, c + 1); // right
-
-            // bottom 3
-            checkMine(r + 1, c - 1); // bottom left
-            checkMine(r + 1, c); // bottom
-            checkMine(r + 1, c + 1); // bottom right
+            for (MineTile t : mt.getNeighbourTiles()) {
+                checkMine(t);
+            }
         }
 
         if (tilesRevealed == numRows * numCols - mineList.size()) {
@@ -206,11 +184,9 @@ public class Minesweeper {
         }
     }
 
-    int countMine(int r, int c) {
-        if (r < 0 || r >= numRows || c < 0 || c >= numCols) {
-            return 0;
-        }
-        if (mineList.contains(board[r][c])) {
+    int countMine(MineTile mt) {
+
+        if (mineList.contains(board[mt.row][mt.col])) {
             return 1;
         }
         return 0;

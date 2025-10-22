@@ -1,7 +1,7 @@
-# Minesweeper (v1.0.0)
+# Minesweeper (v1.1.0)
 
 A simple Java Swing implementation of the classic Minesweeper game.  
-This first version displays a static 8x8 board filled with bomb symbols.
+Version 1.1.0 introduces internal code refactoring for better readability and maintainability.
 
 ## How to Run
 
@@ -17,9 +17,17 @@ Current Features
 
     8x8 board layout
 
-    Each tile displays a bomb symbol, nothing or number of adjacent bombs
+    Random mine placement
 
-    Basic Java Swing user interface
+    Left-click to reveal a tile, right-click to place or remove a flag
+
+    Display of numbers showing adjacent mines
+
+    Win and game-over messages
+
+    Refactored logic for checking neighbouring tiles
+
+    Improved method structure and code clarity
 
 Planned Improvements
 
@@ -39,8 +47,32 @@ Planned Improvements
 
     Sound effects
 
+Changelog
+
+    Version 1.0.0
+
+    First functional version of the game
+
+    8x8 board with static mine display
+
+    Left-click to reveal, right-click to place flags
+
+    Basic Java Swing user interface
+
+
+    Version 1.1.0
+
+    Refactored code for better readability and maintainability
+
+    checkMine and countMine now use MineTile objects
+
+    Logic for checking neighbouring tiles centralized in getNeighbourTiles method
+
+    No change in gameplay or user interface
+
 Author
 
 Zoran Juras
-Version: 1.0.0
+Version: 1.1.0
 License: MIT
+
