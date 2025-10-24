@@ -1,10 +1,12 @@
 /**
  * Minesweeper
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: Zoran Juras
  * Description: Refactored version of Minesweeper in Java Swing.
- *              checkMine and countMine now use MineTile objects for cleaner code.
- * Date: 2025-10-22
+ *              Introduces a larger 16x16 board, 40 randomly placed mines,
+ *              custom tile rendering with centered numbers and color-coded
+ *              indicators for adjacent mines.
+ * Date: 2025-10-24
  */
 
 import javax.swing.*;
@@ -20,10 +22,23 @@ public class Minesweeper {
     private class MineTile extends JButton {
         int row;
         int col;
+        boolean revealed = false;
+        String displayText = "";
 
-        public MineTile (int row, int col) {
+        public MineTile(int row, int col) {
             this.row = row;
             this.col = col;
+            setFont(new Font("Arial", Font.BOLD, 20));
+            setFocusable(false);
+            setMargin(new Insets(0, 0, 0, 0));
+            setBackground(Color.LIGHT_GRAY);
+        }
+
+        public void reveal(String text, Color color) {
+            this.revealed = true;
+            this.displayText = text;
+            setForeground(color);
+            repaint();
         }
 
         public ArrayList<MineTile> getNeighbourTiles() {
@@ -37,10 +52,29 @@ public class Minesweeper {
             }
             return neighbours;
         }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+            if (revealed) {
+                g2.setColor(Color.WHITE);
+                g2.fillRect(0, 0, getWidth(), getHeight());
+
+                g2.setColor(getForeground());
+                g2.setFont(getFont());
+                FontMetrics fm = g2.getFontMetrics();
+                int x = (getWidth() - fm.stringWidth(displayText)) / 2;
+                int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+                g2.drawString(displayText, x, y);
+            }
+        }
     }
 
-    int tileSize = 70;
-    int numRows = 8;
+    int tileSize = 40;
+    int numRows = 16;
     int numCols = numRows;
     int boardWidth = numCols * tileSize;
     int boardHeight = numRows * tileSize;
@@ -53,7 +87,7 @@ public class Minesweeper {
     MineTile[][] board = new MineTile[numRows][numCols];
     ArrayList<MineTile> mineList;
 
-    int mineCount = 5;
+    int mineCount = 40;
     int tilesRevealed = 0; // goal is to reveal all the tiles except mines
     boolean gameOver= false;
     Random random = new Random();
@@ -83,8 +117,8 @@ public class Minesweeper {
                 board[r][c] = tile;
 
                 tile.setFocusable(false);
-                tile.setMargin(new Insets(0, 0, 0, 0));
-                tile.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 45));
+                tile.setMargin(new Insets(4, 2, 0, 2));
+                tile.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
 
                 tile.addMouseListener(new MouseAdapter() {
                     @Override
@@ -167,10 +201,21 @@ public class Minesweeper {
         }
 
         if (minesFound > 0) {
-            tile.setText(Integer.toString(minesFound));
-        }
-        else {
-            tile.setText("");
+            Color color = switch (minesFound) {
+                case 1 -> Color.BLUE;
+                case 2 -> new Color(0, 128, 0);
+                case 3 -> Color.RED;
+                case 4 -> new Color(0, 0, 128);
+                case 5 -> new Color(128, 0, 0);
+                case 6 -> new Color(64, 224, 208);
+                case 7 -> Color.BLACK;
+                case 8 -> Color.GRAY;
+                default -> Color.BLACK;
+            };
+            tile.reveal(Integer.toString(minesFound), color);
+        } else {
+            tile.reveal("", Color.BLACK);
+
 
             for (MineTile t : mt.getNeighbourTiles()) {
                 checkMine(t);

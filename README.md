@@ -33,8 +33,6 @@ Planned Improvements
 
     Right-click question mark support
 
-    Different colours for numbers
-
     Menu bar
 
     Timer and mine counter
@@ -49,7 +47,7 @@ Planned Improvements
 
 Changelog
 
-    Version 1.0.0
+   Version 1.0.0
 
     First functional version of the game
 
@@ -60,7 +58,7 @@ Changelog
     Basic Java Swing user interface
 
 
-    Version 1.1.0
+   Version 1.1.0
 
     Refactored code for better readability and maintainability
 
@@ -70,9 +68,17 @@ Changelog
 
     No change in gameplay or user interface
 
+   Version 1.2.0
+
+    Graphical improvements including centered numbers and custom tile rendering
+
+    Board size increased to 16x16 with 40 mines
+
+    Better visual clarity and text rendering
+
 Author
 
 Zoran Juras
-Version: 1.1.0
+Version: 1.2.0
 License: MIT
 
