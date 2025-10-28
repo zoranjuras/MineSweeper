@@ -2,11 +2,13 @@
  * Minesweeper
  * Version: 1.2.0
  * Author: Zoran Juras
- * Description: Refactored version of Minesweeper in Java Swing.
- *              Introduces a larger 16x16 board, 40 randomly placed mines,
- *              custom tile rendering with centered numbers and color-coded
- *              indicators for adjacent mines.
- * Date: 2025-10-24
+ *
+ * Description: A fully playable Java Swing implementation of the classic Minesweeper game.
+ * Version 1.3.0 introduces a main menu and settings dialog for improved user interaction.
+ * The game now supports multiple difficulty levels (Easy, Medium, Hard),
+ * and features custom tile rendering with color-coded numbers and emoji-based icons.
+ *
+ * Date: 2025-10-28
  */
 
 import javax.swing.*;
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
-public class Minesweeper {
+public class Minesweeper extends Component {
 
     private class MineTile extends JButton {
         int row;
@@ -75,7 +77,7 @@ public class Minesweeper {
 
     int tileSize = 40;
     int numRows = 16;
-    int numCols = numRows;
+    int numCols = 16;
     int boardWidth = numCols * tileSize;
     int boardHeight = numRows * tileSize;
 
@@ -104,8 +106,13 @@ public class Minesweeper {
         textLabel.setText("Minesweeper: "+ mineCount + " mines to find");
         textLabel.setOpaque(true);
 
+        JButton menuButton = new JButton("Menu");
+        menuButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        menuButton.addActionListener(e -> new GameMenuDialog(Minesweeper.this).setVisible(true));
+
         textPanel.setLayout(new BorderLayout());
-        textPanel.add(textLabel);
+        textPanel.add(textLabel, BorderLayout.CENTER);
+        textPanel.add(menuButton, BorderLayout.EAST);
         frame.add(textPanel, BorderLayout.NORTH);
 
         boardPanel.setLayout(new GridLayout(numRows, numCols));
@@ -156,6 +163,89 @@ public class Minesweeper {
 
         setMines();
     }
+
+    public void applySettings(String difficulty) {
+        switch (difficulty) {
+            case "Easy (9x9, 10 mines)" -> {
+                numRows = 9;
+                numCols = 9;
+                mineCount = 10;
+            }
+            case "Medium (16x16, 40 mines)" -> {
+                numRows = 16;
+                numCols = 16;
+                mineCount = 40;
+            }
+            case "Hard (24x24, 99 mines)" -> {
+                numRows = 24;
+                numCols = 24;
+                mineCount = 99;
+            }
+        }
+
+        frame.getContentPane().remove(boardPanel);
+        boardPanel = new JPanel(new GridLayout(numRows, numCols));
+        frame.add(boardPanel, BorderLayout.CENTER);
+
+        board = new MineTile[numRows][numCols];
+        tilesRevealed = 0;
+        gameOver = false;
+
+        for (int r = 0; r < numRows; r++) {
+            for (int c = 0; c < numCols; c++) {
+                MineTile tile = new MineTile(r, c);
+                board[r][c] = tile;
+                tile.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
+                tile.setMargin(new Insets(4, 2, 0, 2));
+                tile.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+                        if (gameOver) return;
+                        MineTile t = (MineTile) e.getSource();
+
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            if (Objects.equals(t.getText(), "")) {
+                                if (mineList.contains(t)) gameLost();
+                                else checkMine(t);
+                            }
+                        } else if (e.getButton() == MouseEvent.BUTTON3) {
+                            if (t.getText().isEmpty() && t.isEnabled()) t.setText("\uD83D\uDEA9");
+                            else if (Objects.equals(t.getText(), "\uD83D\uDEA9")) t.setText("");
+                        }
+                    }
+                });
+                boardPanel.add(tile);
+            }
+        }
+
+        frame.revalidate();
+        frame.repaint();
+
+        setMines();
+        textLabel.setText("Minesweeper: " + mineCount + " mines to find");
+    }
+
+    public void newGame() {
+        // Reset game state
+        tilesRevealed = 0;
+        gameOver = false;
+        textLabel.setText("Minesweeper: " + mineCount + " mines to find");
+
+        // Clear the board
+        for (int r = 0; r < numRows; r++) {
+            for (int c = 0; c < numCols; c++) {
+                MineTile tile = board[r][c];
+                tile.setEnabled(true);
+                tile.setText("");
+                tile.revealed = false;
+                tile.displayText = "";
+                tile.setBackground(Color.LIGHT_GRAY);
+            }
+        }
+
+        setMines();
+    }
+
 
     private void revealMines() {
         for (MineTile mt : mineList) {

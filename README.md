@@ -15,31 +15,29 @@ Version 1.1.0 introduces internal code refactoring for better readability and ma
 
 Current Features
 
-    8x8 board layout
+    9x9, 16x16 or 24x24 board layouts based on selected difficulty
 
-    Random mine placement
+    Randomized mine placement
 
     Left-click to reveal a tile, right-click to place or remove a flag
 
-    Display of numbers showing adjacent mines
+    Color-coded numbers for adjacent mines
 
-    Win and game-over messages
+    Custom tile rendering with centered text
 
-    Refactored logic for checking neighbouring tiles
+    Game-over and victory messages
 
-    Improved method structure and code clarity
+    Menu dialog with options for New Game, Settings, and Exit
+
+    Settings dialog to choose between Easy, Medium, and Hard difficulties
+
+    Clean and readable code structure with modular design
 
 Planned Improvements
 
     Right-click question mark support
 
-    Menu bar
-
     Timer and mine counter
-
-    Dialog for restarting game or change settings
-
-    Multiple difficulty levels
 
     Visual effects
 
@@ -76,9 +74,21 @@ Changelog
 
     Better visual clarity and text rendering
 
+Version 1.3.0
+
+    Introduced Game Menu and Settings dialogs
+
+    Added difficulty selection (Easy, Medium, Hard)
+
+    Dynamic board generation based on difficulty
+
+    Refined visual layout and improved user experience
+
+    Minor performance and stability enhancements
+
 Author
 
 Zoran Juras
-Version: 1.2.0
+Version: 1.3.0
 License: MIT
 
