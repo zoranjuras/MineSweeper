@@ -1,16 +1,3 @@
-/**
- * Minesweeper
- * Version: 1.2.0
- * Author: Zoran Juras
- *
- * Description: A fully playable Java Swing implementation of the classic Minesweeper game.
- * Version 1.3.0 introduces a main menu and settings dialog for improved user interaction.
- * The game now supports multiple difficulty levels (Easy, Medium, Hard),
- * and features custom tile rendering with color-coded numbers and emoji-based icons.
- *
- * Date: 2025-10-28
- */
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -19,81 +6,79 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
+/**
+ * The {@code Minesweeper} class provides the graphical user interface (GUI)
+ * and user interaction logic for the classic Minesweeper game implemented in Java Swing.
+ * <p>
+ * It manages window creation, tile rendering, user input (left/right clicks),
+ * and communication with the underlying minefield logic. The game supports
+ * three difficulty levels — Easy, Medium, and Hard — and includes a main menu
+ * with settings and restart functionality.
+ *
+ * <p>
+ * This class acts as the visual controller that directly interacts with
+ * {@link MineTile} components arranged on a {@link JPanel} grid.
+ *
+ * @author
+ *     Zoran Juras
+ * @version
+ *     1.4.0
+ * @since
+ *     2025-11-01
+ */
 public class Minesweeper extends Component {
 
-    private class MineTile extends JButton {
-        int row;
-        int col;
-        boolean revealed = false;
-        String displayText = "";
-
-        public MineTile(int row, int col) {
-            this.row = row;
-            this.col = col;
-            setFont(new Font("Arial", Font.BOLD, 20));
-            setFocusable(false);
-            setMargin(new Insets(0, 0, 0, 0));
-            setBackground(Color.LIGHT_GRAY);
-        }
-
-        public void reveal(String text, Color color) {
-            this.revealed = true;
-            this.displayText = text;
-            setForeground(color);
-            repaint();
-        }
-
-        public ArrayList<MineTile> getNeighbourTiles() {
-            ArrayList<MineTile> neighbours = new ArrayList<>();
-            for (int i = row - 1; i <= row + 1; i++) {
-                for (int j = col - 1; j <= col + 1; j++) {
-                    if (i == row && j == col) continue;
-                    if (i < 0 || i >= numRows || j < 0 || j >= numCols) continue;
-                    neighbours.add(board[i][j]);
-                }
-            }
-            return neighbours;
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D) g;
-            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-            if (revealed) {
-                g2.setColor(Color.WHITE);
-                g2.fillRect(0, 0, getWidth(), getHeight());
-
-                g2.setColor(getForeground());
-                g2.setFont(getFont());
-                FontMetrics fm = g2.getFontMetrics();
-                int x = (getWidth() - fm.stringWidth(displayText)) / 2;
-                int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-                g2.drawString(displayText, x, y);
-            }
-        }
-    }
-
+    /** Default pixel size for each tile. */
     int tileSize = 40;
+
+    /** Current number of rows on the board. */
     int numRows = 16;
+
+    /** Current number of columns on the board. */
     int numCols = 16;
+
+    /** Window width in pixels (auto-calculated). */
     int boardWidth = numCols * tileSize;
+
+    /** Window height in pixels (auto-calculated). */
     int boardHeight = numRows * tileSize;
 
+    /** Main application frame. */
     JFrame frame = new JFrame("Minesweeper");
+
+    /** Label displaying game information and status. */
     JLabel textLabel = new JLabel();
+
+    /** Panel that holds the status text and menu button. */
     JPanel textPanel = new JPanel();
+
+    /** Panel representing the game board grid. */
     JPanel boardPanel = new JPanel();
 
+    /** 2D array of all game tiles. */
     MineTile[][] board = new MineTile[numRows][numCols];
+
+    /** List containing all tiles that have mines. */
     ArrayList<MineTile> mineList;
 
+    /** Total number of mines on the board. */
     int mineCount = 40;
-    int tilesRevealed = 0; // goal is to reveal all the tiles except mines
-    boolean gameOver= false;
+
+    /** Number of tiles revealed so far. */
+    int tilesRevealed = 0;
+
+    /** Indicates whether the game has ended. */
+    boolean gameOver = false;
+
+    /** Random number generator used for mine placement. */
     Random random = new Random();
 
+    /**
+     * Constructs a new {@code Minesweeper} game window and initializes all UI components.
+     * <p>
+     * Sets up the main frame, header label, menu button, and creates the grid
+     * of {@link MineTile} buttons. Automatically places mines after setup.
+     */
     public Minesweeper() {
         frame.setSize(boardWidth, boardHeight);
         frame.setLocationRelativeTo(null);
@@ -103,7 +88,7 @@ public class Minesweeper extends Component {
 
         textLabel.setFont(new Font("Arial", Font.BOLD, 25));
         textLabel.setHorizontalAlignment(JLabel.CENTER);
-        textLabel.setText("Minesweeper: "+ mineCount + " mines to find");
+        textLabel.setText("Minesweeper: " + mineCount + " mines to find");
         textLabel.setOpaque(true);
 
         JButton menuButton = new JButton("Menu");
@@ -126,44 +111,21 @@ public class Minesweeper extends Component {
                 tile.setFocusable(false);
                 tile.setMargin(new Insets(4, 2, 0, 2));
                 tile.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
-
-                tile.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        if (gameOver) {
-                            return;
-                        }
-                        MineTile tile = (MineTile) e.getSource();
-
-                        // left click
-                        if (e.getButton() == MouseEvent.BUTTON1) {
-                            if (Objects.equals(tile.getText(), "")) {
-                                if (mineList.contains(tile)) {
-                                    gameLost();
-                                }
-                                else {
-                                    checkMine(tile);
-                                }
-                            }
-                        // right click
-                        } else if (e.getButton() == MouseEvent.BUTTON3) {
-                            if (tile.getText().isEmpty() && tile.isEnabled()) {
-                                tile.setText("\uD83D\uDEA9"); // 🚩
-                            } else if (Objects.equals(tile.getText(), "\uD83D\uDEA9")) {
-                                tile.setText("");
-                            }
-                        }
-                    }
-                });
-
+                tile.addMouseListener(createTileMouseListener());
                 boardPanel.add(tile);
             }
         }
-        frame.setVisible(true);
 
+        frame.setVisible(true);
         setMines();
     }
 
+    /**
+     * Applies the selected difficulty setting by rebuilding the board grid
+     * with updated dimensions and mine counts.
+     *
+     * @param difficulty a string label representing difficulty (Easy, Medium, Hard)
+     */
     public void applySettings(String difficulty) {
         switch (difficulty) {
             case "Easy (9x9, 10 mines)" -> {
@@ -197,23 +159,7 @@ public class Minesweeper extends Component {
                 board[r][c] = tile;
                 tile.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 20));
                 tile.setMargin(new Insets(4, 2, 0, 2));
-                tile.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        if (gameOver) return;
-                        MineTile t = (MineTile) e.getSource();
-
-                        if (e.getButton() == MouseEvent.BUTTON1) {
-                            if (Objects.equals(t.getText(), "")) {
-                                if (mineList.contains(t)) gameLost();
-                                else checkMine(t);
-                            }
-                        } else if (e.getButton() == MouseEvent.BUTTON3) {
-                            if (t.getText().isEmpty() && t.isEnabled()) t.setText("\uD83D\uDEA9");
-                            else if (Objects.equals(t.getText(), "\uD83D\uDEA9")) t.setText("");
-                        }
-                    }
-                });
+                tile.addMouseListener(createTileMouseListener());
                 boardPanel.add(tile);
             }
         }
@@ -225,13 +171,15 @@ public class Minesweeper extends Component {
         textLabel.setText("Minesweeper: " + mineCount + " mines to find");
     }
 
+    /**
+     * Starts a new game using the current difficulty settings.
+     * Resets all tiles, re-enables the board, and re-places the mines.
+     */
     public void newGame() {
-        // Reset game state
         tilesRevealed = 0;
         gameOver = false;
         textLabel.setText("Minesweeper: " + mineCount + " mines to find");
 
-        // Clear the board
         for (int r = 0; r < numRows; r++) {
             for (int c = 0; c < numCols; c++) {
                 MineTile tile = board[r][c];
@@ -246,47 +194,86 @@ public class Minesweeper extends Component {
         setMines();
     }
 
+    /**
+     * Creates a {@link MouseAdapter} that defines behavior for left and right mouse clicks on tiles.
+     * <ul>
+     *   <li>Left click: reveals a tile (or ends the game if it’s a mine)</li>
+     *   <li>Right click: toggles a flag emoji (🚩)</li>
+     * </ul>
+     *
+     * @return a configured {@link MouseAdapter} for tile interaction
+     */
+    private MouseAdapter createTileMouseListener() {
+        return new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (gameOver) return;
+                MineTile tile = (MineTile) e.getSource();
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    if (Objects.equals(tile.getText(), "")) {
+                        if (mineList.contains(tile)) gameLost();
+                        else checkMine(tile);
+                    }
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    if (tile.getText().isEmpty() && tile.isEnabled())
+                        tile.setText("\uD83D\uDEA9"); // 🚩
+                    else if (Objects.equals(tile.getText(), "\uD83D\uDEA9"))
+                        tile.setText("");
+                }
+            }
+        };
+    }
 
+    /**
+     * Reveals all mines on the board (💣) — used when the player loses or wins.
+     */
     private void revealMines() {
         for (MineTile mt : mineList) {
             mt.setText("\uD83D\uDCA3"); // 💣
         }
     }
 
+    /**
+     * Handles game loss logic by revealing all mines and displaying
+     * a "GAME OVER!" message on the UI.
+     */
     private void gameLost() {
         revealMines();
         gameOver = true;
         textLabel.setText("GAME OVER!");
     }
 
+    /**
+     * Randomly places {@code mineCount} mines across the board.
+     * Mines are stored in the {@link #mineList}.
+     */
     private void setMines() {
-
         mineList = new ArrayList<>();
-        int minesLeft = mineCount;
-
-        while (minesLeft > 0) {
-            int r = random.nextInt(numRows); // 0 to numRows - 1
+        while (mineList.size() < mineCount) {
+            int r = random.nextInt(numRows);
             int c = random.nextInt(numCols);
             MineTile tile = board[r][c];
-            if (!mineList.contains(tile)) {
-                mineList.add(tile);
-                minesLeft -= 1;
-            }
+            if (!mineList.contains(tile)) mineList.add(tile);
         }
     }
 
+    /**
+     * Checks and reveals the clicked tile.
+     * <p>
+     * If the tile has no adjacent mines, recursively reveals surrounding tiles.
+     * When all non-mine tiles are revealed, the player wins.
+     *
+     * @param mt the {@link MineTile} that was clicked
+     */
     void checkMine(MineTile mt) {
-
         MineTile tile = board[mt.row][mt.col];
-        if (!tile.isEnabled()) {
-            return;
-        }
+        if (!tile.isEnabled()) return;
+
         tile.setEnabled(false);
-        tilesRevealed += 1;
+        tilesRevealed++;
 
         int minesFound = 0;
-
-        for (MineTile t : mt.getNeighbourTiles()) {
+        for (MineTile t : mt.getNeighbourTiles(numRows, numCols, board)) {
             minesFound += countMine(t);
         }
 
@@ -305,9 +292,7 @@ public class Minesweeper extends Component {
             tile.reveal(Integer.toString(minesFound), color);
         } else {
             tile.reveal("", Color.BLACK);
-
-
-            for (MineTile t : mt.getNeighbourTiles()) {
+            for (MineTile t : mt.getNeighbourTiles(numRows, numCols, board)) {
                 checkMine(t);
             }
         }
@@ -319,11 +304,13 @@ public class Minesweeper extends Component {
         }
     }
 
+    /**
+     * Counts whether a given tile contains a mine.
+     *
+     * @param mt the {@link MineTile} to check
+     * @return 1 if the tile is a mine, 0 otherwise
+     */
     int countMine(MineTile mt) {
-
-        if (mineList.contains(board[mt.row][mt.col])) {
-            return 1;
-        }
-        return 0;
+        return mineList.contains(board[mt.row][mt.col]) ? 1 : 0;
     }
 }

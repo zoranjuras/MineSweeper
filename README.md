@@ -1,7 +1,8 @@
-# Minesweeper (v1.1.0)
+# Minesweeper (v1.4.0)
 
-A simple Java Swing implementation of the classic Minesweeper game.  
-Version 1.1.0 introduces internal code refactoring for better readability and maintainability.
+A modern Java Swing implementation of the classic Minesweeper game.  
+Version 1.1.0 focuses on internal code improvements and stability updates,
+preparing the project for future modularization and cleaner architecture.
 
 ## How to Run
 
@@ -42,6 +43,10 @@ Planned Improvements
     Visual effects
 
     Sound effects
+
+    High score tracking
+
+    Save and load last difficulty selection
 
 Changelog
 
@@ -86,9 +91,23 @@ Version 1.3.0
 
     Minor performance and stability enhancements
 
+Version 1.4.0
+
+    Refactored and streamlined Minesweeper core class
+
+    Game logic moved to new class MineField
+
+    Improved method structure for better modularity
+
+    Enhanced event handling
+
+    Internal cleanup of redundant and duplicate code
+
+    MineField class extracted to its own file
+
 Author
 
 Zoran Juras
-Version: 1.3.0
+Version: 1.4.0
 License: MIT
 
