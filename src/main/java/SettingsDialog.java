@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
  * Provides options for adjusting game difficulty and board configuration.
  * Intended to be used as part of the Minesweeper game.
  *
- * Version: 1.0.0
+ * Version: 1.5.0
  * Author: Zoran Juras
  * Date: 2025-10-28
  */
@@ -27,7 +27,7 @@ public class SettingsDialog extends JDialog {
         difficultyLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         difficultyLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        String[] difficulties = {"Easy (9x9, 10 mines)", "Medium (16x16, 40 mines)", "Hard (24x24, 99 mines)"};
+        String[] difficulties = {"Easy (9x9, 10 mines)", "Medium (16x16, 40 mines)", "Hard (16x32, 99 mines)"};
         difficultyBox = new JComboBox<>(difficulties);
         difficultyBox.setFont(new Font("Arial", Font.PLAIN, 14));
 

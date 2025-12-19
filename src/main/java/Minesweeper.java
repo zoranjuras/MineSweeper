@@ -22,7 +22,7 @@ import java.util.Random;
  * @author
  *     Zoran Juras
  * @version
- *     1.4.0
+ *     1.5.0
  * @since
  *     2025-11-01
  */
@@ -62,7 +62,8 @@ public class Minesweeper extends Component {
     ArrayList<MineTile> mineList;
 
     /** Total number of mines on the board. */
-    int mineCount = 40;
+    int initialMineCount = 40;
+    int mineCount = initialMineCount;
 
     /** Number of tiles revealed so far. */
     int tilesRevealed = 0;
@@ -88,7 +89,7 @@ public class Minesweeper extends Component {
 
         textLabel.setFont(new Font("Arial", Font.BOLD, 25));
         textLabel.setHorizontalAlignment(JLabel.CENTER);
-        textLabel.setText("Minesweeper: " + mineCount + " mines to find");
+        textLabel.setText(mineCount + " mines to find");
         textLabel.setOpaque(true);
 
         JButton menuButton = new JButton("Menu");
@@ -117,7 +118,7 @@ public class Minesweeper extends Component {
         }
 
         frame.setVisible(true);
-        setMines();
+        setMines(mineCount);
     }
 
     /**
@@ -138,14 +139,18 @@ public class Minesweeper extends Component {
                 numCols = 16;
                 mineCount = 40;
             }
-            case "Hard (24x24, 99 mines)" -> {
-                numRows = 24;
-                numCols = 24;
+            case "Hard (16x32, 99 mines)" -> {
+                numRows = 16;
+                numCols = 32;
                 mineCount = 99;
             }
         }
 
+        initialMineCount = mineCount;
+
         frame.getContentPane().remove(boardPanel);
+        frame.setSize(numCols * tileSize, numRows * tileSize);
+        frame.setLocationRelativeTo(null);
         boardPanel = new JPanel(new GridLayout(numRows, numCols));
         frame.add(boardPanel, BorderLayout.CENTER);
 
@@ -164,11 +169,8 @@ public class Minesweeper extends Component {
             }
         }
 
-        frame.revalidate();
-        frame.repaint();
-
-        setMines();
-        textLabel.setText("Minesweeper: " + mineCount + " mines to find");
+        setMines(mineCount);
+        textLabel.setText(mineCount + " mines to find");
     }
 
     /**
@@ -176,9 +178,10 @@ public class Minesweeper extends Component {
      * Resets all tiles, re-enables the board, and re-places the mines.
      */
     public void newGame() {
+        mineCount = initialMineCount;
         tilesRevealed = 0;
         gameOver = false;
-        textLabel.setText("Minesweeper: " + mineCount + " mines to find");
+        textLabel.setText(mineCount + " mines to find");
 
         for (int r = 0; r < numRows; r++) {
             for (int c = 0; c < numCols; c++) {
@@ -191,7 +194,7 @@ public class Minesweeper extends Component {
             }
         }
 
-        setMines();
+        setMines(mineCount);
     }
 
     /**
@@ -215,10 +218,14 @@ public class Minesweeper extends Component {
                         else checkMine(tile);
                     }
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    if (tile.getText().isEmpty() && tile.isEnabled())
+                    if (tile.getText().isEmpty() && tile.isEnabled()) {
                         tile.setText("\uD83D\uDEA9"); // 🚩
-                    else if (Objects.equals(tile.getText(), "\uD83D\uDEA9"))
+                        mineCount -= 1;
+                        textLabel.setText("Minesweeper: " + mineCount + " mines to find");}
+                    else if (Objects.equals(tile.getText(), "\uD83D\uDEA9")) {
                         tile.setText("");
+                        mineCount += 1;
+                        textLabel.setText("Minesweeper: " + mineCount + " mines to find");}
                 }
             }
         };
@@ -230,7 +237,9 @@ public class Minesweeper extends Component {
     private void revealMines() {
         for (MineTile mt : mineList) {
             mt.setText("\uD83D\uDCA3"); // 💣
+            mt.setForeground(Color.BLACK);
         }
+        mineCount = initialMineCount;
     }
 
     /**
@@ -247,7 +256,7 @@ public class Minesweeper extends Component {
      * Randomly places {@code mineCount} mines across the board.
      * Mines are stored in the {@link #mineList}.
      */
-    private void setMines() {
+    private void setMines(int mineCount) {
         mineList = new ArrayList<>();
         while (mineList.size() < mineCount) {
             int r = random.nextInt(numRows);

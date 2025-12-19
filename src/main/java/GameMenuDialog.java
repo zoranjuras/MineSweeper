@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
  * A simple modal dialog that provides options to start a new game, open settings, or exit the application.
  * Intended to be used as part of the Minesweeper game.
  *
- * Version: 1.0.0
+ * Version: 1.5.0
  * Author: Zoran Juras
  * Date: 2025-10-28
  */
@@ -45,12 +45,9 @@ public class GameMenuDialog extends JDialog {
             if (settingsDialog.isConfirmed()) {
                 String difficulty = settingsDialog.getSelectedDifficulty();
 
+                dispose();
                 parent.applySettings(difficulty);
 
-                JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(parent),
-                        "Difficulty set to: " + difficulty,
-                        "Settings Saved",
-                        JOptionPane.INFORMATION_MESSAGE);
             }
         });
 

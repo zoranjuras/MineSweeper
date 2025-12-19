@@ -36,9 +36,7 @@ Current Features
 
 Planned Improvements
 
-    Right-click question mark support
-
-    Timer and mine counter
+    Timer
 
     Visual effects
 
@@ -95,7 +93,7 @@ Version 1.4.0
 
     Refactored and streamlined Minesweeper core class
 
-    Game logic moved to new class MineField
+    Game logic moved to new class MineField, to be implemented later
 
     Improved method structure for better modularity
 
@@ -103,11 +101,18 @@ Version 1.4.0
 
     Internal cleanup of redundant and duplicate code
 
-    MineField class extracted to its own file
+Version 1.5.0
+
+    Simplified menus to be more functional
+
+    Corrected size of the minefield and tiles when settings are changed
+
+    When revealed, mines are now correctly displayed in black
+
 
 Author
 
 Zoran Juras
-Version: 1.4.0
+Version: 1.5.0
 License: MIT
 
